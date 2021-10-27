@@ -76,25 +76,54 @@ function load_mailbox(mailbox) {
     .then((data) => {
       // Show the mailbox name
       const emailsView = document.createElement("ul");
+      try {
+        data.map((email) => {
+          const li = document.createElement("li");
+          li.className =
+            "p-2 border d-flex justify-content-between align-items-center";
+          li.innerHTML = `<span>
+            <strong> 
+            <button class="btn btn-outline-primary" onclick="load_mailbox(\'${email.id}\')">
+             ${email.sender} 
+             </button> 
+             </strong> ${email.subject}
+            </span>
+            <span class="text-secondary">${email.timestamp}</span>`;
+          emailsView.appendChild(li);
+          if (email.read) {
+            emailsView.className = "bg-gray";
+          } else {
+            email.className = "bg-light";
+          }
+        });
+        document.querySelector("#emails-view").innerHTML = `<h3>${
+          mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+        }</h3>`;
+      } catch {
+        // TODO something wrong with this, it update all the emails
+        if (!data.read) {
+          fetch("/emails/" + data.id, {
+            method: "PUT",
+            body: JSON.stringify({
+              read: true,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+        }
+        emailsView.innerHTML = `
+          <p><strong>From</strong>: ${data.sender}</p>
+          <p><strong>To</strong>: ${data.recipients.join(
+            " <strong> And </strong> "
+          )}</p>
+          <p><strong>Subject</strong>: ${data.subject}</p>
+          <p><strong>TimeStamp</strong>: ${data.timestamp}</p>
+          <button class="btn btn-outline-primary">Read</button>
+          <hr class="w-100"/>
+          <p>${data.body}</p>
+        `;
+      }
 
-      data.map((email) => {
-        const li = document.createElement("li");
-        li.className =
-          "p-2 border d-flex justify-content-between align-items-center";
-        li.innerHTML = `<span>
-          <strong> 
-          <a href="/emails/${email.id}">
-           ${email.sender} 
-           </a> 
-           </strong> ${email.subject}
-          </span>
-          <span class="text-secondary">${email.timestamp}</span>`;
-        emailsView.appendChild(li);
-      });
-
-      document.querySelector("#emails-view").innerHTML = `<h3>${
-        mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
-      }</h3>`;
       document.querySelector("#emails-view").appendChild(emailsView);
     })
     .catch((err) => {

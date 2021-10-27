@@ -5,3 +5,7 @@ textarea {
 ul {
   padding: 0;
 }
+
+.bg-gray {
+  background-color: #a6a6a698;
+}
