@@ -63,15 +63,13 @@ function load_mailbox(mailbox) {
           return;
         }
         const emailsView = document.createElement("ul");
-
+        emailsView.style.cursor = "pointer";
         const li = document.createElement("li");
         li.className =
           "p-2 border d-flex justify-content-between align-items-center";
         li.innerHTML = `<span>
             <strong> 
-            <button class="btn btn-outline-primary">
              ${email.sender} 
-             </button> 
              </strong> ${email.subject}
             </span>
             <span class="text-secondary">${email.timestamp}</span>`;
@@ -122,7 +120,7 @@ function load_email(email) {
       }</button>
     </div>
     <hr>
-    ${email["body"]}
+    ${email["body"].replace(/\n/g, " <br/> ")}
   `;
 
   document.querySelector("#archive").addEventListener("click", () => {
